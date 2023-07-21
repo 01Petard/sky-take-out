@@ -7,9 +7,14 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface DishMapper {
@@ -20,7 +25,7 @@ public interface DishMapper {
      * @param dishPageQueryDTO
      * @return
      */
-    Page<Dish> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+    Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
     /**
      * 根据分类id查询菜品数量
@@ -31,18 +36,50 @@ public interface DishMapper {
     Integer countByCategoryId(Long categoryId);
 
     /**
+     * 新增菜品
+     * @param dish
+     */
+    @AutoFill(value = OperationType.INSERT)
+    void addDish(Dish dish);
+
+
+    /**
      * 修改菜品状态
      * @param status
      * @param id
      */
-    @Update("update dish set status = #{status} where id = #{id}")
-    @AutoFill(value = OperationType.UPDATE)
-    void changeDishStatus(Integer status, Long id);
+    @Update("update dish set status = #{status},update_time = #{now},update_user = #{currentId} where id = #{id}")
+//    @AutoFill(value = OperationType.UPDATE)
+    //不使用公共字段填充，使用最原始的办法修改字段
+    void changeDishStatus(Integer status, Long id, LocalDateTime now, Long currentId);
+
+    /**
+     * 根据id返回菜品
+     * @param dishId
+     * @return
+     */
+    @Select("select * from dish where id = #{id}")
+    Dish getDishById(Long dishId);
+
+    /**
+     * 根据id删除菜品
+     * @param dishId
+     */
+    @Delete("delete from dish where id = #{id}")
+    void deleteDishById(Long dishId);
 
     /**
      * 修改菜品信息
      * @param dish
      */
-    @AutoFill(value = OperationType.UPDATE)
-    void updateDishInfo(Dish dish);
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Select("select * from dish where category_id = #{categoryId}")
+    List<Dish> getDishesByCategoryId(Long categoryId);
 }
