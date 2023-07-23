@@ -5,17 +5,13 @@ import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.CategoryDTO;
-import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Category;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
-import com.sky.service.CategoryService;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
@@ -63,7 +59,7 @@ public class DishServiceImpl implements DishService {
     public void addDishWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
-        dish.setStatus(StatusConstant.ENABLE); //默认添加菜品后立即起售
+        dish.setStatus(StatusConstant.DISABLE); //默认添加菜品后立即起售
         //向菜品表插入1条菜品数据
         dishMapper.addDish(dish);
         //获取插入语句生成的主键值
@@ -74,7 +70,7 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
             });
-            dishFlavorMapper.addBatchFlavor(flavors);
+            dishFlavorMapper.addBatchFlavors(flavors);
         }
     }
 
@@ -129,7 +125,7 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     @Override
-    public DishVO getDishByIdWithFlavor(Long id) {
+    public DishVO getDishAndFlavorsByDishId(Long id) {
         //根据菜品id查询菜品
         Dish dish = dishMapper.getDishById(id);
         //根据菜品id查询口味
@@ -148,6 +144,7 @@ public class DishServiceImpl implements DishService {
      * @param dishDTO
      */
     @Override
+    @Transactional
     public void updateDishWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -161,7 +158,8 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishDTO.getId());
             });
-            dishFlavorMapper.addBatchFlavor(flavors);
+            //批量插入菜品对应的口味
+            dishFlavorMapper.addBatchFlavors(flavors);
         }
 
     }

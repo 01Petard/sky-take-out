@@ -1,18 +1,18 @@
 package com.sky.controller.admin;
 
-import com.sky.dto.DishPageQueryDTO;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
-import com.sky.service.DishService;
 import com.sky.service.SetmealService;
+import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/setmeal")
@@ -35,7 +35,7 @@ public class SetmealController {
     @ApiOperation("新增套餐")
     public Result addSetmeal(@RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐：{}", setmealDTO);
-        setmealService.addSetmealWithDish(setmealDTO);
+        setmealService.addSetmealWithDishes(setmealDTO);
         return Result.success();
     }
 
@@ -47,6 +47,30 @@ public class SetmealController {
         return Result.success();
     }
 
+    @GetMapping("/{id}")
+    @ApiOperation("根据套餐id查询对应的菜品")
+    public Result<SetmealVO> getSetmealAndDishesBySetmealId(@PathVariable Long id){
+        log.info("根据套餐id查询套餐及对应的菜品：{}，", id);
+        SetmealVO setmealVO = setmealService.getSetmealAndDishesBySetmealId(id);
+        return Result.success(setmealVO);
+    }
+
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result updateSetmeal(@RequestBody SetmealDTO setmealDTO){
+        log.info("修改后的套餐：{}", setmealDTO);
+        setmealService.updateSetmealWithSetmealDish(setmealDTO);
+        return Result.success();
+    }
+
+    @DeleteMapping
+    @ApiOperation("批量删除套餐")
+    public Result deleteSetmeal(@RequestParam List<Long> ids){
+        log.info("批量删除套餐：{}", ids);
+        setmealService.deleteBatchSetmeal(ids);
+        return Result.success();
+
+    }
 
 
 }

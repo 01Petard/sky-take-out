@@ -4,13 +4,11 @@ import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
-import com.sky.entity.SetmealDish;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 @Mapper
 public interface SetmealMapper {
@@ -38,15 +36,24 @@ public interface SetmealMapper {
     void addSetmeal(Setmeal setmeal);
 
     /**
-     * 批量插入套餐对应的菜品
-     * @param setmealDishes
-     */
-    void addBatchSetmealDish(List<SetmealDish> setmealDishes);
-
-    /**
      * 起售停售套餐
      * @param setmeal
      */
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    /**
+     * 根据套餐id查询套餐
+     * @param id
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getSetmealById(Long id);
+
+    /**
+     * 根据id删除套餐
+     * @param setmealId
+     */
+    @Delete("delete from setmeal where id = #{setmealId}")
+    void deleteSetmealById(Long setmealId);
 }

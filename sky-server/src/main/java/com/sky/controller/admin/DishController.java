@@ -1,13 +1,10 @@
 package com.sky.controller.admin;
 
-import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
-import com.sky.entity.User;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
-import com.sky.service.CategoryService;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
@@ -76,9 +73,9 @@ public class DishController {
      * @return
      */
     @GetMapping("/{id}")
-    public Result<DishVO> getDishById(@PathVariable Long id) {
+    public Result<DishVO> getDishAndFlavorsByDishId(@PathVariable Long id) {
         log.info("根据id查询菜品和对应的口味：{}", id);
-        DishVO dishVO = dishService.getDishByIdWithFlavor(id);
+        DishVO dishVO = dishService.getDishAndFlavorsByDishId(id);
         return Result.success(dishVO);
     }
 
@@ -112,7 +109,6 @@ public class DishController {
         return Result.success();
     }
 
-
     /**
      * 根据分类id查询菜品
      * @return
@@ -124,5 +120,6 @@ public class DishController {
         List<Dish> dishes = dishService.getDishesByCategoryId(categoryId);
         return Result.success(dishes);
     }
+
 
 }
