@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping("/user/user")
-@Api("用户端相关接口")
+@Api(tags = "用户端相关接口")
 @Slf4j
 public class UserController {
 

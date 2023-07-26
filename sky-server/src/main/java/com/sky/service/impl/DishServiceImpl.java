@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -173,6 +174,26 @@ public class DishServiceImpl implements DishService {
     public List<Dish> getDishesByCategoryId(Long categoryId) {
         List<Dish> dishes = dishMapper.getDishesByCategoryId(categoryId);
         return dishes;
+    }
+
+    /**
+     * 根据分类id查询菜品及其口味，返回给前端
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<DishVO> listWithFlavor(Long categoryId) {
+        List<Dish> dishList = dishMapper.getDishesByCategoryId2User(categoryId);
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish dish : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish,dishVO);
+            //查询菜品对应的口味，将口味封装到VO对象中
+            List<DishFlavor> dishFlavors = dishFlavorMapper.getFlavorByDishId(dish.getId());
+            dishVO.setFlavors(dishFlavors);
+            dishVOList.add(dishVO);
+        }
+        return dishVOList;
     }
 
 

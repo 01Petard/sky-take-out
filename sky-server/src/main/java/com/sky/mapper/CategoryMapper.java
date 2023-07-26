@@ -54,4 +54,20 @@ public interface CategoryMapper {
      */
     @Select("select * from category where status = 1 and type = #{type} order by sort asc, create_time desc")
     List<Category> list(Integer type);
+
+    /**
+     * 根据类型id查询分类，此方法为type==null时的应对办法
+     * @param type
+     * @return
+     */
+    @Select("select * from category where status = 1 order by sort asc, create_time desc")
+    List<Category> listAll(Integer type);
+
+    /**
+     * 根据分类id返回分类名称
+     * @param categoryId
+     * @return
+     */
+    @Select("select * from category where id = #{categoryId}")
+    Category getCategoryByCategoryId(Long categoryId);
 }

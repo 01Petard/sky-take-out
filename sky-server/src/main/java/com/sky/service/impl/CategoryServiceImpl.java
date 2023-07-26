@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -127,7 +128,23 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public List<Category> list(Integer type) {
-        return categoryMapper.list(type);
+        List<Category> categoryList = new ArrayList<>();
+        if (type == null){
+            categoryList = categoryMapper.listAll(type);
+        }else {
+            categoryList = categoryMapper.list(type);
+        }
+        return categoryList;
+    }
+
+    /**
+     * 根据分类id返回分类名称
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public Category getCategoryByCategoryId(Long categoryId) {
+        return categoryMapper.getCategoryByCategoryId(categoryId);
     }
 
 }

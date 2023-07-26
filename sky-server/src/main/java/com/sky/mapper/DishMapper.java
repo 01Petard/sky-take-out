@@ -6,6 +6,7 @@ import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.entity.Dish;
+import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
@@ -82,4 +83,21 @@ public interface DishMapper {
      */
     @Select("select * from dish where category_id = #{categoryId}")
     List<Dish> getDishesByCategoryId(Long categoryId);
+
+    /**
+     * 根据分类id查询菜品，用于返回给用户端，只能查询“起售”状态的菜品
+     * @param categoryId
+     * @return
+     */
+    @Select("select * from dish where category_id = #{categoryId} and status = 1")
+    List<Dish> getDishesByCategoryId2User(Long categoryId);
+
+
+    /**
+     * 动态条件查询菜品
+     * @param dish
+     * @return
+     */
+    List<Setmeal> getDish(Dish dish);
+
 }
