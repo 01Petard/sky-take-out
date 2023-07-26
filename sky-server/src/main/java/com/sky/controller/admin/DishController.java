@@ -11,9 +11,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -23,7 +25,17 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
+    /**
+     * 删除指定格式的缓存
+     * @param pattern
+     */
+    private void cleanCache(String pattern){
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
+    }
 
     /**
      * 菜品分页查询
@@ -50,6 +62,8 @@ public class DishController {
     public Result addDish(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.addDishWithFlavor(dishDTO);
+        //新增菜品后，清理缓存数据
+        cleanCache("dish_" + dishDTO.getCategoryId());
         return Result.success();
     }
 
@@ -63,6 +77,8 @@ public class DishController {
     public Result deleteDish(@RequestParam List<Long> ids) {  //注意：@RequestParam对应的参数必须和前端返回的参数一样，这里的ids不能改成其他名称
         log.info("菜品批量删除：{}", ids);
         dishService.deleteBatch(ids);
+        //批量删除时，清理所有菜品缓存数据
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -91,6 +107,8 @@ public class DishController {
     public Result updateDishInfo(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品信息：{}", dishDTO);
         dishService.updateDishWithFlavor(dishDTO);
+        //修改一个菜品时，清理所有菜品缓存数据
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -106,6 +124,8 @@ public class DishController {
     public Result changeDishStatus(@PathVariable(value = "status") Integer status, Long id) {
         log.info("停售起售菜品，菜品状态：{}，菜品id：{}", status, id);
         dishService.changeDishStatus(status, id);
+        //修改一个菜品时，清理所有菜品缓存数据
+        cleanCache("dish_*");
         return Result.success();
     }
 
