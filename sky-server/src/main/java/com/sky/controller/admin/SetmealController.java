@@ -35,7 +35,7 @@ public class SetmealController {
 
     @PostMapping
     @ApiOperation("新增套餐")
-    @CacheEvict(cacheNames = "setmealCache", key = "#setmealDTO.categoryId")
+//    @CacheEvict(cacheNames = "setmealCache", key = "#setmealDTO.categoryId")  //修改：新增时不需要删除缓存，因为前端查不到，起售时再删缓存
     public Result addSetmeal(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐：{}", setmealDTO);
         setmealService.addSetmealWithDishes(setmealDTO);
