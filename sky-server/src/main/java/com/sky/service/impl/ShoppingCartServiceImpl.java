@@ -43,7 +43,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setUserId(userId);
         //根据用户id查询商品是否已经在购物车中
         List<ShoppingCart> shoppingCarts = shoppingCartMapper.list(shoppingCart);
-        //判断当前商品是否已经再购物车中
+        //判断当前商品是否已经在购物车中
         if (shoppingCarts != null && shoppingCarts.size() > 0) {
             //如果存在了，数量加一
             ShoppingCart cart = shoppingCarts.get(0);
@@ -111,11 +111,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         ShoppingCart shoppingCart = new ShoppingCart();
         BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
         shoppingCart.setUserId(userId);
-        //查询该商品，获得商品的数量=
+        //查询该商品，获得商品的数量
         List<ShoppingCart> shoppingCarts = shoppingCartMapper.list(shoppingCart);
         //获得将商品的信息，将商品的数量减一，最后保存到数据库
         ShoppingCart cart = shoppingCarts.get(0);
-        cart.setNumber(cart.getNumber() - 1);
-        shoppingCartMapper.updateNumberById(cart);
+        if (cart.getNumber() > 1){
+            //如果减去商品时数量大于1，就将商品数量减一
+            cart.setNumber(cart.getNumber() - 1);
+            shoppingCartMapper.updateNumberById(cart);
+        }
+        else if (cart.getNumber() == 1) {
+            //如果减去商品时数量为1，就将该商品从购物车删除
+            if (shoppingCartDTO.getSetmealId() == null){  //如果商品类型是”菜品“，就删除该菜品
+                shoppingCartMapper.deleteByDishId(userId, shoppingCartDTO.getDishId());
+            }else {   //如果商品类型是”套餐“，就删除该套餐
+                shoppingCartMapper.deleteBySetmealId(userId, shoppingCartDTO.getSetmealId());
+            }
+        }
+
+
     }
 }
