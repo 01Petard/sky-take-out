@@ -406,17 +406,20 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
 
-        //支付状态
-        Integer payStatus = ordersDB.getPayStatus();
-        if (payStatus.equals(Orders.PAID)) {
-            //用户已支付，需要退款
-            String refund = weChatPayUtil.refund(
-                    ordersDB.getNumber(),
-                    ordersDB.getNumber(),
-                    new BigDecimal("0.01"),
-                    new BigDecimal("0.01"));
-            log.info("申请退款：{}", refund);
-        }
+        //模拟微信支付的情况下，跳过微信退款流程，直接修改订单状态
+        log.info("申请退款：{}", ordersDB.getAmount());
+
+//        //支付状态
+//        Integer payStatus = ordersDB.getPayStatus();
+//        if (payStatus.equals(Orders.PAID)) {
+//            //用户已支付，需要退款
+//            String refund = weChatPayUtil.refund(
+//                    ordersDB.getNumber(),
+//                    ordersDB.getNumber(),
+//                    new BigDecimal("0.01"),
+//                    new BigDecimal("0.01"));
+//            log.info("申请退款：{}", refund);
+//        }
 
         // 拒单需要退款，根据订单id更新订单状态、拒单原因、取消时间
         Orders orders = new Orders();
@@ -437,17 +440,20 @@ public class OrderServiceImpl implements OrderService {
         // 根据id查询订单
         Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
 
-        //支付状态
-        Integer payStatus = ordersDB.getPayStatus();
-        if (payStatus == 1) {
-            //用户已支付，需要退款
-            String refund = weChatPayUtil.refund(
-                    ordersDB.getNumber(),
-                    ordersDB.getNumber(),
-                    new BigDecimal("0.01"),
-                    new BigDecimal("0.01"));
-            log.info("申请退款：{}", refund);
-        }
+        //模拟微信支付的情况下，跳过微信退款流程，直接修改订单状态
+        log.info("模拟微信申请退款：{}", ordersDB.getAmount());
+
+//        //支付状态
+//        Integer payStatus = ordersDB.getPayStatus();
+//        if (payStatus == 1) {
+//            //用户已支付，需要退款
+//            String refund = weChatPayUtil.refund(
+//                    ordersDB.getNumber(),
+//                    ordersDB.getNumber(),
+//                    new BigDecimal("0.01"),
+//                    new BigDecimal("0.01"));
+//            log.info("申请退款：{}", refund);
+//        }
 
         // 管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间
         Orders orders = new Orders();

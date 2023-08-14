@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.core.annotation.Order;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,5 +108,10 @@ public interface OrderMapper {
      */
     List<GoodsSalesDTO> getSalesTop10(LocalDateTime begin, LocalDateTime end);
 
-
+    /**
+     * 统计指定时间内的营业额
+     * @param map
+     * @return
+     */
+    Double getOrdersSumByMap(HashMap<String, Object> map);
 }
