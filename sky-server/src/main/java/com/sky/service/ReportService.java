@@ -1,11 +1,13 @@
 package com.sky.service;
 
+import com.aliyuncs.http.HttpResponse;
 import com.sky.vo.OrderReportVO;
 import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 
 public interface ReportService {
@@ -45,4 +47,6 @@ public interface ReportService {
      * @return
      */
     SalesTop10ReportVO getSaleTop10Statistics(LocalDate begin, LocalDate end);
+
+    void exportBusinessData(HttpServletResponse response);
 }

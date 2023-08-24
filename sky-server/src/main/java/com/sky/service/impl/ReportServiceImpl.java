@@ -1,25 +1,30 @@
 package com.sky.service.impl;
 
+import com.aliyuncs.http.HttpResponse;
 import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +34,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 统计指定时间内的营业额
@@ -203,6 +210,73 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(StringUtils.join(names, ","))
                 .numberList(StringUtils.join(numbers, ","))
                 .build();
+    }
+
+    /**
+     * 导出Excel数据报表
+     *
+     * @param response
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        //查询前30天--昨天的经营数据
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+        LocalDateTime beginTime = LocalDateTime.of(dateBegin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(dateEnd, LocalTime.MAX);
+        //查询获得概览数据
+        BusinessDataVO businessData = workspaceService.getBusinessData(beginTime, endTime);
+        //创建excel对象
+        InputStream templateInput = this.getClass().getClassLoader().getResourceAsStream("template/BusinessDataStatisticalReport.xlsx");
+        try {
+            assert templateInput != null;
+            XSSFWorkbook excel = new XSSFWorkbook(templateInput);
+            //获取第一个sheet页
+            XSSFSheet sheet = excel.getSheetAt(0);
+//            XSSFSheet sheet = excel.getSheet("sheet1");
+            //设置概览数据
+            //设置”时间“
+            sheet.getRow(1).getCell(1).setCellValue("时间：" + dateBegin + "至" + dateEnd);
+            //设置”营业额“
+            sheet.getRow(3).getCell(2).setCellValue(businessData.getTurnover());
+            //设置”订单完成率“
+            sheet.getRow(3).getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            //设置”新增用户数“
+            sheet.getRow(3).getCell(6).setCellValue(businessData.getNewUsers());
+            //设置”有效订单“
+            sheet.getRow(4).getCell(2).setCellValue(businessData.getValidOrderCount());
+            //设置”平均客单价“
+            sheet.getRow(4).getCell(4).setCellValue(businessData.getUnitPrice());
+            //设置明细数据
+            for (int i = 0; i < 30; i++) {
+                LocalDate date = dateBegin.plusDays(i);
+                BusinessDataVO businessDataDetail = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+                //设置”日期“
+                sheet.getRow(7 + i).getCell(1).setCellValue(date.toString());
+                //设置”营业额“
+                sheet.getRow(7 + i).getCell(2).setCellValue(businessDataDetail.getTurnover());
+                //设置”有效订单“
+                sheet.getRow(7 + i).getCell(3).setCellValue(businessDataDetail.getValidOrderCount());
+                //设置”订单完成率“
+                sheet.getRow(7 + i).getCell(4).setCellValue(businessDataDetail.getOrderCompletionRate());
+                //设置”平均客单价“
+                sheet.getRow(7 + i).getCell(5).setCellValue(businessDataDetail.getUnitPrice());
+                //设置”新增用户数“
+                sheet.getRow(7 + i).getCell(6).setCellValue(businessDataDetail.getNewUsers());
+            }
+            //通过输出流将Excel文件下载到客户端浏览器
+            ServletOutputStream outputStream = response.getOutputStream();
+            excel.write(outputStream);
+
+            //关闭资源
+            excel.close();
+            outputStream.close();
+            templateInput.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
 
