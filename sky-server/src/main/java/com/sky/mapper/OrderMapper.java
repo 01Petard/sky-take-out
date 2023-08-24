@@ -57,12 +57,14 @@ public interface OrderMapper {
 
     /**
      * 分页条件查询并按下单时间排序
+     *
      * @param ordersPageQueryDTO
      */
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 
     /**
      * 根据id查询订单
+     *
      * @param id
      */
     @Select("select * from orders where id=#{id}")
@@ -70,6 +72,7 @@ public interface OrderMapper {
 
     /**
      * 根据状态统计订单数量
+     *
      * @param status
      */
     @Select("select count(id) from orders where status = #{status}")
@@ -77,6 +80,7 @@ public interface OrderMapper {
 
     /**
      * 根据订单状态和下单时间查询订单
+     *
      * @param status
      * @param orderTime
      * @return
@@ -86,6 +90,7 @@ public interface OrderMapper {
 
     /**
      * 根据动态条件统计营业额数据
+     *
      * @param map
      * @return
      */
@@ -93,6 +98,7 @@ public interface OrderMapper {
 
     /**
      * 根据动态条件统计订单数量
+     *
      * @param map
      * @return
      */
@@ -100,6 +106,7 @@ public interface OrderMapper {
 
     /**
      * 统计指定时间区间内的销量排名前10
+     *
      * @param begin
      * @param end
      * @return
@@ -108,6 +115,7 @@ public interface OrderMapper {
 
     /**
      * 统计指定时间内的营业额
+     *
      * @param map
      * @return
      */
@@ -115,8 +123,25 @@ public interface OrderMapper {
 
     /**
      * 统计指定时间内的用户量
+     *
      * @param map
      * @return
      */
     Integer getUserCountByMap(HashMap<String, Object> map);
+
+    /**
+     * 统计指定时间内的订单量
+     *
+     * @param map
+     */
+    Integer getOrdersCount(HashMap<String, Object> map);
+
+    /**
+     * 统计指定时间内的销量排名
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<GoodsSalesDTO> getSalesTop(LocalDateTime begin, LocalDateTime end);
 }
