@@ -122,14 +122,6 @@ public interface OrderMapper {
     Double getOrdersSumByMap(HashMap<String, Object> map);
 
     /**
-     * 统计指定时间内的用户量
-     *
-     * @param map
-     * @return
-     */
-    Integer getUserCountByMap(HashMap<String, Object> map);
-
-    /**
      * 统计指定时间内的订单量
      *
      * @param map
