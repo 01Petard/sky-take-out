@@ -115,15 +115,15 @@ public class DishController {
     /**
      * 停售起售菜品
      *
-     * @param status
-     * @param id
+     * @param my_status
+     * @param my_id
      * @return
      */
     @PostMapping("/status/{status}")
     @ApiOperation("停售起售菜品")
-    public Result changeDishStatus(@PathVariable(value = "status") Integer status, Long id) {
-        log.info("停售起售菜品，菜品状态：{}，菜品id：{}", status, id);
-        dishService.changeDishStatus(status, id);
+    public Result changeDishStatus(@PathVariable(value = "status") Integer my_status, @RequestParam(value = "id") Long my_id) {
+        log.info("停售起售菜品，菜品状态：{}，菜品id：{}", my_status, my_id);
+        dishService.changeDishStatus(my_status, my_id);
         //修改一个菜品时，清理所有菜品缓存数据
         cleanCache("dish_*");
         return Result.success();

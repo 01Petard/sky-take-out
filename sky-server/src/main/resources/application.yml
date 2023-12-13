@@ -3,13 +3,14 @@ server:
 
 spring:
   profiles:
-    active: dev  # prod / dev
+    active: prod  # prod / dev
   main:
     allow-circular-references: true
   datasource:
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+#      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
       username: ${sky.datasource.username}
       password: ${sky.datasource.password}
   redis:
