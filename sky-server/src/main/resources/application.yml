@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8008
 
 spring:
   profiles:
@@ -18,8 +18,6 @@ spring:
     port: ${sky.redis.port}
 #    password: ${sky.redis.password}
     database: ${sky.redis.database}
-
-
 
 
 mybatis:
